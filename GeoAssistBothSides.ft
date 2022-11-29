@@ -1,0 +1,10 @@
+﻿APPLICATION "_\geoassistbothsides_"
+FUNC_DLL "chooks\GeoAssistBothSides.dll"
+RES_DLL "SAME"
+dnRES_NAME "_GeoAssistBothSides.GeoAssistBothSides"
+CATEGORY "Automation"
+FUNCTION NET "GeoAssistBothSidesRun"
+dnSPNG "Run16"
+dnLPNG"Run32"
+dnTIP "RunTip"
+END_FUNCTION
