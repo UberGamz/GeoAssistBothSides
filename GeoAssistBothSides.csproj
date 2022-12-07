@@ -60,6 +60,9 @@
     <None Include="GeoAssistBothSides.ft" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="ChainDataInterop">
+      <HintPath>..\..\..\..\..\Program Files\Mastercam 2022\Mastercam\ChainDataInterop.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="NETHook3_0">
       <HintPath>..\..\..\..\..\Program Files\Mastercam 2022\Mastercam\NETHook3_0.dll</HintPath>
