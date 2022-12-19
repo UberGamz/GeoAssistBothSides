@@ -8,6 +8,7 @@ using Mastercam.Database.Interop;
 using Mastercam.Curves;
 using Mastercam.Math;
 using System.Collections.Generic;
+using Mastercam.IO.Types;
 
 namespace _GeoAssistBothSides
 {
@@ -17,9 +18,7 @@ namespace _GeoAssistBothSides
         {
             void offsetCutchain()
             {
-                var depth = -0.100;
-                var roughAngle = 15.0;
-                var finishAngle = 20.0;
+
                 var levelTenList1 = new List<int>();
                 var level139List1 = new List<int>();
                 var levelTenList2 = new List<int>();
@@ -31,10 +30,29 @@ namespace _GeoAssistBothSides
                 int cleanOut = 12;
                 int roughSurf = 138;
                 int finishSurf = 139;
+                var depth = -0.100;
+                var roughAngle = 15.0;
+                var finishAngle = 20.0;
                 var selectedCutChain = ChainManager.GetMultipleChains("Select Geometry");
-                DialogManager.AskForNumber("Enter Depth", ref depth);
-                DialogManager.AskForAngle("Enter Rough Angle", ref roughAngle);
-                DialogManager.AskForAngle("Enter Finish Angle", ref finishAngle);
+                if (selectedCutChain == null)
+                {
+                    return;
+                }
+                var depthDialog = DialogManager.AskForNumber("Enter Depth", ref depth);
+                if (depthDialog == 0)
+                {
+                    return;
+                }
+                    var roughAngleDialog = DialogManager.AskForAngle("Enter Rough Angle", ref roughAngle);
+                if (roughAngleDialog == 0)
+                {
+                    return;
+                }
+                var finishAngleDialog = DialogManager.AskForAngle("Enter Finish Angle", ref finishAngle);
+                if (finishAngleDialog == 0)
+                {
+                    return;
+                }
                 SurfaceDraftParams roughSurfaceDraftParams1 = new SurfaceDraftParams
                 {
                     draftMethod = SurfaceDraftParams.DraftMethod.Length,
@@ -391,6 +409,7 @@ namespace _GeoAssistBothSides
                     SelectionManager.UnselectAllGeometry();
                     ////////////////////////////////
                 }
+                
             }
             offsetCutchain();
             GraphicsManager.Repaint(true);
