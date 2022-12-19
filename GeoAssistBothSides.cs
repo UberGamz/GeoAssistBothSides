@@ -411,7 +411,19 @@ namespace _GeoAssistBothSides
                 }
                 
             }
+            void deSelect()
+            {
+                var selectedGeo = SearchManager.GetGeometry();
+                foreach (var entity in selectedGeo)
+                {
+                    entity.Retrieve();
+                    entity.Selected = false;
+                    entity.Commit();
+                }
+            }
+            deSelect();
             offsetCutchain();
+            deSelect();
             GraphicsManager.Repaint(true);
             return MCamReturn.NoErrors;
         }
