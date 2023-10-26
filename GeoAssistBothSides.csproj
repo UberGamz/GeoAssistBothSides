@@ -70,6 +70,12 @@
     <Reference Include="NETHook3_0">
       <HintPath>..\..\..\..\..\Program Files\Mastercam 2022\Mastercam\NETHook3_0.dll</HintPath>
     </Reference>
+    <Reference Include="SurfaceToolpathInterop">
+      <HintPath>..\..\..\..\..\Program Files\Mastercam 2022\Mastercam\SurfaceToolpathInterop.dll</HintPath>
+    </Reference>
+    <Reference Include="SurfaceTPDepthsInterop">
+      <HintPath>..\..\..\..\..\Program Files\Mastercam 2022\Mastercam\SurfaceTPDepthsInterop.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
