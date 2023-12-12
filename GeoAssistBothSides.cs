@@ -19,19 +19,15 @@ namespace _GeoAssistBothSides
         public Mastercam.App.Types.MCamReturn GeoAssistBothSidesRun(Mastercam.App.Types.MCamReturn notused)
         {
             var depth = -0.100;
-            var roughAngle = 15.0;
-            var selectedCutChain = ChainManager.GetMultipleChains("Select Geometry");
+            var toAnvilAngle = 15.0;
+            var toLinerAngle = 10.0;
+            var selectedCutChain = ChainManager.ChainAll(60);
             if (selectedCutChain == null)
             {
                 return MCamReturn.NoErrors;
             }
             var depthDialog = DialogManager.AskForNumber("Enter Depth", ref depth);
             if (depthDialog == 0)
-            {
-                return MCamReturn.NoErrors;
-            }
-            var roughAngleDialog = DialogManager.AskForAngle("Enter Rough Angle", ref roughAngle);
-            if (roughAngleDialog == 0)
             {
                 return MCamReturn.NoErrors;
             }
@@ -52,20 +48,36 @@ namespace _GeoAssistBothSides
                 LevelsManager.RefreshLevelsManager();
                 GraphicsManager.Repaint(true);
 
-                SurfaceDraftParams roughSurfaceDraftParamsRight = new SurfaceDraftParams
+                SurfaceDraftParams toAnvilSurfaceDraftParamsRight = new SurfaceDraftParams
                 {
                     draftMethod = SurfaceDraftParams.DraftMethod.Length,
                     geometryType = SurfaceDraftParams.GeometryType.Surface,
                     length = depth,
-                    angle = Mastercam.Math.VectorManager.RadiansToDegrees(-roughAngle),
+                    angle = Mastercam.Math.VectorManager.RadiansToDegrees(-toAnvilAngle),
                     draftDirection = SurfaceDraftParams.DraftDirection.Defined
                 };
-                SurfaceDraftParams roughSurfaceDraftParamsLeft = new SurfaceDraftParams
+                SurfaceDraftParams toAnvilSurfaceDraftParamsLeft = new SurfaceDraftParams
                 {
                     draftMethod = SurfaceDraftParams.DraftMethod.Length,
                     geometryType = SurfaceDraftParams.GeometryType.Surface,
                     length = depth,
-                    angle = Mastercam.Math.VectorManager.RadiansToDegrees(roughAngle),
+                    angle = Mastercam.Math.VectorManager.RadiansToDegrees(toAnvilAngle),
+                    draftDirection = SurfaceDraftParams.DraftDirection.Defined
+                };
+                SurfaceDraftParams toLinerSurfaceDraftParamsRight = new SurfaceDraftParams
+                {
+                    draftMethod = SurfaceDraftParams.DraftMethod.Length,
+                    geometryType = SurfaceDraftParams.GeometryType.Surface,
+                    length = depth,
+                    angle = Mastercam.Math.VectorManager.RadiansToDegrees(-toLinerAngle),
+                    draftDirection = SurfaceDraftParams.DraftDirection.Defined
+                };
+                SurfaceDraftParams toLinerSurfaceDraftParamsLeft = new SurfaceDraftParams
+                {
+                    draftMethod = SurfaceDraftParams.DraftMethod.Length,
+                    geometryType = SurfaceDraftParams.GeometryType.Surface,
+                    length = depth,
+                    angle = Mastercam.Math.VectorManager.RadiansToDegrees(toLinerAngle),
                     draftDirection = SurfaceDraftParams.DraftDirection.Defined
                 };
                 ChainManager.ChainTolerance = 0.0005;
@@ -75,6 +87,9 @@ namespace _GeoAssistBothSides
                     double cornerRadius = offsetDistance;
                     foreach (var chain in inputChainList)
                     {
+                        var chainColorID = chain.FirstEntityId;
+                        var chainColorEntity = Geometry.RetrieveEntity(chainColorID);
+                        var chainColor = chainColorEntity.Color;
                         var geoList = new List<Geometry>();
                         chain.OffsetChain2D(offsetSide, offsetDistance, cornerType, cornerRadius, false, offsetDistance/2, false);
                         var resultChainGeo = SearchManager.GetResultGeometry();
@@ -96,23 +111,28 @@ namespace _GeoAssistBothSides
                         }
                         var thisChainArray = ChainManager.ChainGeometry(geoList.ToArray());
                         var thisChain = thisChainArray[0];
-                        SurfaceDraftParams roughDraftParams;
-
-                        //var newFillets = GeometryManipulationManager.FilletChain(thisChain, offsetDistance, geoLevel, geoLevel, FilletDirectionType.Either);
-                        //foreach (var entity in newFillets)
-                        //{
-                        //    geoList.Add(entity);
-                        //}
-                        //thisChainArray = ChainManager.ChainGeometry(geoList.ToArray());
-                        //thisChain = thisChainArray[0];
-
-                        if (offsetSide == OffsetSideType.Right)
+                        SurfaceDraftParams roughDraftParams = new SurfaceDraftParams { };
+                        if (chainColor == 15)
                         {
-                            roughDraftParams = roughSurfaceDraftParamsLeft;
+                            if (offsetSide == OffsetSideType.Right)
+                            {
+                                roughDraftParams = toAnvilSurfaceDraftParamsLeft;
+                            }
+                            else
+                            {
+                                roughDraftParams = toAnvilSurfaceDraftParamsRight;
+                            }
                         }
-                        else
+                        if (chainColor == 13)
                         {
-                            roughDraftParams = roughSurfaceDraftParamsRight;
+                            if (offsetSide == OffsetSideType.Right)
+                            {
+                                roughDraftParams = toLinerSurfaceDraftParamsLeft;
+                            }
+                            else
+                            {
+                                roughDraftParams = toLinerSurfaceDraftParamsRight;
+                            }
                         }
 
                         var draftSurface = SurfaceDraftInterop.CreateDrafts(thisChain, roughDraftParams, false, 1);
@@ -121,6 +141,7 @@ namespace _GeoAssistBothSides
                             if (Geometry.RetrieveEntity(surface) is Geometry roughDraftSurface)
                             {
                                 roughDraftSurface.Level = 138;
+                                roughDraftSurface.Color = chainColor;
                                 roughDraftSurface.Commit();
                             }
                         }
